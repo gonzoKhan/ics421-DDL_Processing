@@ -50,12 +50,16 @@ for x in range(int(nodes)+1):
     currentline = cluster.readline()
     for y in range(4):
         if currentline == '\n':
-            y = y-1
+            print(' ')
+            #y = y-1
 
         else:
             tupled = parseLine(currentline)
             print (tupled)
-            node[x][y] = tupled[2]
+            if tupled != '':
+                print(x,y)
+
+                node[x][y] = tupled[2]
             currentline = cluster.readline()
 
 
