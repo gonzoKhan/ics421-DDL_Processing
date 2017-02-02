@@ -31,23 +31,23 @@ clusterconfig = cluster.readline()
 nodes = re.match('^numnodes=(\d+)$', clusterconfig, flags=re.MULTILINE).group(1)
 print ("nodes={0}".format(nodes))
 
-node = [[0 for n in range(int(nodes)+1)] for m in range(5)]
-
-for x in range(int(nodes)+1):
-    currentline = cluster.readline()
-    for y in range(4):
-        if currentline == '\n':
-            print(' ')
-            #y = y-1
-
-        else:
-            tupled = parseLine(currentline)
-            print (tupled)
-            if tupled != '':
-                print(x,y)
-
-                node[x][y] = tupled[2]
-            currentline = cluster.readline()
+# node = [[0 for n in range(int(nodes)+1)] for m in range(5)]
+#
+# for x in range(int(nodes)+1):
+#     currentline = cluster.readline()
+#     for y in range(4):
+#         if currentline == '\n':
+#             print(' ')
+#             #y = y-1
+#
+#         else:
+#             tupled = parseLine(currentline)
+#             print (tupled)
+#             if tupled != '':
+#                 print(x,y)
+#
+#                 node[x][y] = tupled[2]
+#             currentline = cluster.readline()
 
 
 
