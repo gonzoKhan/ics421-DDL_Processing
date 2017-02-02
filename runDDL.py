@@ -31,13 +31,15 @@ clusterconfig = cluster.readline()
 nodes = re.match('^numnodes=(\d+)$', clusterconfig, flags=re.MULTILINE).group(1)
 print ("nodes={0}".format(nodes))
 
+node = {}
+
 for x in range(int(nodes)):
     for y in range(0,5):
         currentline = cluster.readline()
         temp = parseLine(currentline)
         if temp != None:
-            
-            print (temp)
+            (name, att, val) = temp
+            node = {(name,att):val}
 
 # For loop that parses clusterconfig into an array of dictionary objects
 # containing the keys:
@@ -53,8 +55,8 @@ for x in range(int(nodes)):
 #             #y = y-1
 #
 #         else:
-#             tupled = parseLine(currentline)
-#             print (tupled)
+#             tupled = parseLine(currentline) two key one value
+#             print (tupled))
 #             if tupled != '':
 #                 print(x,y)
 #
