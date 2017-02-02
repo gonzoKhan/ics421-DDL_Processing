@@ -1,4 +1,5 @@
 import sys
+import re
 import mysql.connector
 
 # Allows custom config and ddl files to be run as parameters.
@@ -17,6 +18,12 @@ else:
 cluster = open(clustername,'r')
 ddl = open(ddlname,'r')
 
+#Sets Variables from config
+currentline = cluster.readline()
+currentline = currentline.rstrip()
+splittemp = currentline.split('=')
+nodes = splittemp[1]
+print (nodes)
 
 # Connects to the mysql database
 connect = mysql.connector.connect(user='dbuser',
