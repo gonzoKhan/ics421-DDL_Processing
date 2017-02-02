@@ -2,6 +2,27 @@ import sys
 import re
 import mysql.connector
 
+# Parses a line seperating it into a 3-tuple
+def parseLine(line):
+    try:
+        m = re.match('^(\w+)\.(\w+)=(.*)$', line)
+        return m.group(1,2,3)
+    except AttributeError:
+        return None
+
+# Runs the ddl for the given connection in the config dictionary object.
+def runSQL(config, ddl):
+    try:
+        connection = mysql.connector.connect(**config)
+        cursor = connection.cursor()
+        cursor.execute(ddl)
+        connection.close()
+    except mysql.connector.Error as err:
+        print(err.msg)
+
+    cursor.close()
+    connection.close()
+
 # Allows custom config and ddl files to be run as parameters.
 # clusrcfg and ddlfile are the default if no parameters are entered.
 
@@ -38,16 +59,12 @@ for x in range(int(nodes)+1):
 
 
 # Connects to the mysql database
-connect = mysql.connector.connect(user='dbuser',
-password="jesus", host='127.0.0.1',
-database='test')
-connect.close()
+# connect = mysql.connector.connect(user='dbuser',
+# password="jesus", host='127.0.0.1',
+# database='test')
+# connect.close()
 
 
 #print (cluster.read() + ddl.read())
 cluster.close()
 ddl.close()
-
-def parseLine(line):
-    m = re.match('^(\w+)\.(\w+)=(.*)$', line)
-    return m.group(1,2,3)
