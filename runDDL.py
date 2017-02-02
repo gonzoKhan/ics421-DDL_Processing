@@ -10,19 +10,6 @@ def parseLine(line):
     except AttributeError:
         return None
 
-# Runs the ddl for the given connection in the config dictionary object.
-def runSQL(config, ddl):
-    try:
-        connection = mysql.connector.connect(**config)
-        cursor = connection.cursor()
-        cursor.execute(ddl)
-        connection.close()
-    except mysql.connector.Error as err:
-        print(err.msg)
-
-    cursor.close()
-    connection.close()
-
 # Allows custom config and ddl files to be run as parameters.
 # clusrcfg and ddlfile are the default if no parameters are entered.
 
