@@ -23,6 +23,21 @@ clusterconfig = cluster.read()
 nodes = re.match('^numnodes=(\d+)$', clusterconfig, flags=re.MULTILINE).group(1)
 print ("nodes={0}".format(nodes))
 
+
+for x in range(int(nodes)):
+    currentline = cluster.readline()
+    for y in range(4):
+        print (y)
+        if currentline == '\n':
+            y = y-1
+
+        else:
+            currentline = cluster.readline()
+            #print (parseLine(currentLine).group(3))
+            print (currentline)
+
+
+
 # Connects to the mysql database
 connect = mysql.connector.connect(user='dbuser',
 password="jesus", host='127.0.0.1',
@@ -30,7 +45,7 @@ database='test')
 connect.close()
 
 
-print (cluster.read() + ddl.read())
+#print (cluster.read() + ddl.read())
 cluster.close()
 ddl.close()
 
