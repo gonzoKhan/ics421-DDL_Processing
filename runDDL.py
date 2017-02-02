@@ -19,22 +19,21 @@ cluster = open(clustername,'r')
 ddl = open(ddlname,'r')
 
 #Sets Variables from config
-clusterconfig = cluster.read()
+clusterconfig = cluster.readline()
 nodes = re.match('^numnodes=(\d+)$', clusterconfig, flags=re.MULTILINE).group(1)
 print ("nodes={0}".format(nodes))
 
-
-for x in range(int(nodes)):
+for x in range(int(nodes)+1):
     currentline = cluster.readline()
     for y in range(4):
-        print (y)
         if currentline == '\n':
             y = y-1
 
         else:
-            currentline = cluster.readline()
+
             #print (parseLine(currentLine).group(3))
             print (currentline)
+            currentline = cluster.readline()
 
 
 
