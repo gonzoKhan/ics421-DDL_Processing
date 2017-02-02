@@ -19,11 +19,9 @@ cluster = open(clustername,'r')
 ddl = open(ddlname,'r')
 
 #Sets Variables from config
-currentline = cluster.readline()
-currentline = currentline.rstrip()
-splittemp = currentline.split('=')
-nodes = splittemp[1]
-print (nodes)
+clusterconfig = cluster.read()
+nodes = re.match('^numnodes=(\d+)$', clusterconfig, flags=re.MULTILINE).group(1)
+print ("nodes={0}".format(nodes))
 
 # Connects to the mysql database
 connect = mysql.connector.connect(user='dbuser',
