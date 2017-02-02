@@ -31,6 +31,10 @@ clusterconfig = cluster.readline()
 nodes = re.match('^numnodes=(\d+)$', clusterconfig, flags=re.MULTILINE).group(1)
 print ("nodes={0}".format(nodes))
 
+# For loop that parses clusterconfig into an array of dictionary objects
+# containing the keys:
+#       nodename, driver, hostname, username, password
+
 # node = [[0 for n in range(int(nodes)+1)] for m in range(5)]
 #
 # for x in range(int(nodes)+1):
@@ -49,6 +53,12 @@ print ("nodes={0}".format(nodes))
 #                 node[x][y] = tupled[2]
 #             currentline = cluster.readline()
 
+
+# For loop that generates a dictionary object containing the parameters
+# for a nodes connection then makes a connectionThread for each node.
+
+
+# For loop that runs each connectionThread.
 
 
 # Connects to the mysql database
