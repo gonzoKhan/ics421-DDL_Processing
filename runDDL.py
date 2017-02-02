@@ -31,6 +31,14 @@ clusterconfig = cluster.readline()
 nodes = re.match('^numnodes=(\d+)$', clusterconfig, flags=re.MULTILINE).group(1)
 print ("nodes={0}".format(nodes))
 
+for x in range(int(nodes)):
+    for y in range(0,5):
+        currentline = cluster.readline()
+        temp = parseLine(currentline)
+        if temp != None:
+            
+            print (temp)
+
 # For loop that parses clusterconfig into an array of dictionary objects
 # containing the keys:
 #       nodename, driver, hostname, username, password
