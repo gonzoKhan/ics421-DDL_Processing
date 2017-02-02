@@ -17,6 +17,7 @@ else:
 cluster = open(clustername,'r')
 ddl = open(ddlname,'r')
 
+
 # Connects to the mysql database
 connect = mysql.connector.connect(user='dbuser',
 password="jesus", host='127.0.0.1',
@@ -25,3 +26,5 @@ connect.close()
 
 
 print (cluster.read() + ddl.read())
+cluster.close()
+ddl.close()
