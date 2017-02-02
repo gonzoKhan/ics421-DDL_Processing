@@ -35,3 +35,7 @@ connect.close()
 print (cluster.read() + ddl.read())
 cluster.close()
 ddl.close()
+
+def parseLine(line):
+    m = re.match('^(\w+)\.(\w+)=(.*)$', line)
+    return m.group(1,2,3)
