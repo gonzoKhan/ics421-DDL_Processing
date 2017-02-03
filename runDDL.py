@@ -33,13 +33,15 @@ print ("nodes={0}".format(nodes))
 
 node = {}
 
-for x in range(int(nodes)):
+for x in range(1,int(nodes)+1):
     for y in range(0,5):
         currentline = cluster.readline()
         temp = parseLine(currentline)
         if temp != None:
             (name, att, val) = temp
-            node = {(name,att):val}
+            node[x, att] = val
+
+print (node)
 
 # For loop that parses clusterconfig into an array of dictionary objects
 # containing the keys:
