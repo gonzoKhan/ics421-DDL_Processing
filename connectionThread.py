@@ -9,6 +9,7 @@ class connectionThread (threading.Thread):
         self.threadID = threadID
         self.config = config
         self.ddl = ddl
+        self.driver = driver
         self.catalog_info = catalog_info
 
     def run(self):
