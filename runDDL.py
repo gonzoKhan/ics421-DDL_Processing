@@ -117,19 +117,25 @@ print (nodes)
 # For loop that generates a dictionary object containing the parameters
 # for a nodes connection then makes a connectionThread for each node.
 threads = list()
+try:
+    for idnum in range(len(nodes)):
+        config = {
+            'user': nodes[idnum]['username'],
+            'password': nodes[idnum]['passwd'],
+            'host': nodes[idnum]['hostname'],
+            'database': 'node' + str(idnum+1)
+        }
+        threads.insert( -1, connectionThread(idnum+1, config, ddl) )
 
-for idnum in range(len(nodes)):
-    config = {
-        'user': nodes[idnum]['username'],
-        'password': nodes[idnum]['passwd'],
-        'host': nodes[idnum]['hostname'],
-        'database': 'node' + str(idnum+1)
-    }
-    threads.insert( -1, connectionThread(idnum+1, config, ddl) )
+    # For loop that runs each connectionThread.
+    for conn in threads:
+        conn.run()
+except KeyError as err:
+    print('INVALID FORMAT IN CLUSTERCONFIG: Expected ' + str(err))
+    print('FAILED TO EXECUTE DDL')
+except:
+    print('UNEXPECTED ERROR')
 
-# For loop that runs each connectionThread.
-for conn in threads:
-    conn.run()
 
 
 # Connects to the mysql database
