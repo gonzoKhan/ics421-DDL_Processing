@@ -47,7 +47,7 @@ class connectionThread (threading.Thread):
                 database = 'catalog'
             )
             cursor = connect.cursor()
-            # Attempt to create tabel if it doesn't exist.
+            # Attempt to create table if it doesn't exist.
             try:
                 cursor.exectue(crt_table)
             except:
@@ -56,7 +56,7 @@ class connectionThread (threading.Thread):
             try:
                 tname = er.search("table (\w+)\(", ddl, flags=re.IGNORECASE).group(1)
                 nodedriver = self.driver
-                nodeurl = self.config['host'] + "/" self.config['database']
+                nodeurl = self.config['host'] + "/" + self.config['database']
                 nodeuser = self.config['user']
                 nodepasswd = self.config['password']
                 nodeid = self.threadID
