@@ -1,7 +1,7 @@
 catalog.driver=mysql.connector
 catalog.hostname=127.0.0.1
 catalog.username=dbuser
-catalog.passwd=mypasswd
+catalog.passwd=jesus
 
 numnodes=2
 

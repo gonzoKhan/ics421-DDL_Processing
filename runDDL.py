@@ -80,39 +80,7 @@ for line in c_buffer:
             except:
                 print("Error: numnodes in config is incorrect.")
 
-
-# for x in range(1,int(nodes)+1):
-#     for y in range(0,5):
-#         currentline = cluster.readline()
-#         temp = parseLine(currentline)
-#         if temp != None:
-#             (name, att, val) = temp
-#             node[x, att] = val
-
 print (nodes)
-
-# For loop that parses clusterconfig into an array of dictionary objects
-# containing the keys:
-#       nodename, driver, hostname, username, password
-
-# node = [[0 for n in range(int(nodes)+1)] for m in range(5)]
-#
-# for x in range(int(nodes)+1):
-#     currentline = cluster.readline()
-#     for y in range(4):
-#         if currentline == '\n':
-#             print(' ')
-#             #y = y-1
-#
-#         else:
-#             tupled = parseLine(currentline) two key one value
-#             print (tupled))
-#             if tupled != '':
-#                 print(x,y)
-#
-#                 node[x][y] = tupled[2]
-#             currentline = cluster.readline()
-
 
 # For loop that generates a dictionary object containing the parameters
 # for a nodes connection then makes a connectionThread for each node.
@@ -136,15 +104,5 @@ except KeyError as err:
 except:
     print('UNEXPECTED ERROR')
 
-
-
-# Connects to the mysql database
-# connect = mysql.connector.connect(user='dbuser',
-# password="jesus", host='127.0.0.1',
-# database='test')
-# connect.close()
-
-
-#print (cluster.read() + ddl.read())
 cluster.close()
 ddlfile.close()

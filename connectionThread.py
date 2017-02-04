@@ -1,6 +1,6 @@
 import threading
 import mysql.connector
-import er
+import re
 
 # Allows multithreading when creating a connection to database and executing a ddl.
 class connectionThread (threading.Thread):
@@ -19,6 +19,7 @@ class connectionThread (threading.Thread):
             cursor.execute(self.ddl)
             connection.close()
             cursor.close()
+
             __updateCatalog()
             print("SUCCESS: THREAD{0} (database={1},hostname={2}): Sucessfully executed DDL".format(self.threadID, self.config['database'], self.config['host']))
         except mysql.connector.Error as err:
@@ -47,14 +48,15 @@ class connectionThread (threading.Thread):
                 database = 'catalog'
             )
             cursor = connect.cursor()
+
             # Attempt to create table if it doesn't exist.
             try:
-                cursor.exectue(crt_table)
+                cursor.execute(crt_table)
             except:
                 pass
 
             try:
-                tname = er.search("table (\w+)\(", ddl, flags=re.IGNORECASE).group(1)
+                tname = re.search("table (\w+)\(", ddl, flags=re.IGNORECASE).group(1)
                 nodedriver = self.driver
                 nodeurl = self.config['host'] + "/" + self.config['database']
                 nodeuser = self.config['user']
@@ -67,8 +69,10 @@ class connectionThread (threading.Thread):
                     "VALUES ({0}, {1}, {2}, {3}, {4}, NULL, {5}, NULL, NULL, NULL)"
                 )
                 cursor.execute(s.format(tname, nodedriver, nodeurl, nodeuseer, nodepasswd, nodeid))
+
             cursor.close()
             connection.close()
+
         except mysql.connector.Error as err:
             print(err)
             exit(1)
