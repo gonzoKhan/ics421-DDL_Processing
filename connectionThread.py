@@ -42,7 +42,7 @@ class connectionThread (threading.Thread):
             except:
                 pass
 
-            tname = re.search("table (\w+)\(", self.ddl, flags=re.IGNORECASE | re.MULTILINE).group(1)
+            tname = re.search("table (\w+)", self.ddl, flags=re.IGNORECASE | re.MULTILINE).group(1)
             nodedriver = self.driver
             nodeurl = self.config['host'] + "/" + self.config['database']
             nodeuser = self.config['user']
@@ -56,7 +56,7 @@ class connectionThread (threading.Thread):
                 "VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', NULL, '{5}', NULL, NULL, NULL);"
             )
             # Query for when a table was removed.
-            drop_table = "DELETE FROM DTABLES WHERE tname={0};"
+            drop_table = "DELETE FROM DTABLES WHERE tname='{0}';"
 
             # Execute if a table was created
             if re.search("CREATE TABLE", self.ddl, flags=re.IGNORECASE | re.MULTILINE):
@@ -69,8 +69,6 @@ class connectionThread (threading.Thread):
         except mysql.connector.Error as err:
             print(err)
             exit(1)
-        except Exception as err:
-            print(str(err))
         finally:
             cursor.close()
             connection.commit()
