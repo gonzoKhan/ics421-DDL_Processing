@@ -1,6 +1,7 @@
 import sys
 import re
 import mysql.connector
+import io
 
 # Parses a line seperating it into a 3-tuple
 def parseLine(line):
@@ -26,10 +27,38 @@ else:
 cluster = open(clustername,'r')
 ddl = open(ddlname,'r')
 
-#Sets Variables from config
-clusterconfig = cluster.readline()
-nodes = re.match('^numnodes=(\d+)$', clusterconfig, flags=re.MULTILINE).group(1)
-print ("nodes={0}".format(nodes))
+# Sets Variables from config
+clusterconfig = cluster.read()
+print(clusterconfig)
+
+# Grab the number of nodes then remove the line.
+nodes = re.search('^numnodes=(\d+)$', clusterconfig, flags=re.MULTILINE | re.IGNORECASE).group(1)
+clusterconfig = re.sub('^numnodes=(\d+)$', '', clusterconfig, count=1, flags=re.MULTILINE | re.IGNORECASE)
+
+print("nodes={0}".format(nodes))
+print(clusterconfig)
+
+c_driver = re.search('^catalog\.driver=(.*)$', clusterconfig, flags=re.MULTILINE | re.IGNORECASE).group(1)
+clusterconfig = re.sub('^catalog\.driver=.*$', '', clusterconfig, count=1, flags=re.MULTILINE | re.IGNORECASE)
+
+c_hostname = re.search('^catalog\.hostname=(.*)$', clusterconfig, flags=re.MULTILINE | re.IGNORECASE).group(1)
+clusterconfig = re.sub('^catalog\.hostname=.*$', '', clusterconfig, count=1, flags=re.MULTILINE | re.IGNORECASE)
+
+c_username = re.search('^catalog\.username=(.*)$', clusterconfig, flags=re.MULTILINE | re.IGNORECASE).group(1)
+clusterconfig = re.sub('^catalog\.username=.*$', '', clusterconfig, count=1, flags=re.MULTILINE | re.IGNORECASE)
+
+c_password = re.search('^catalog\.passwd=(.*)$', clusterconfig, flags=re.MULTILINE | re.IGNORECASE).group(1)
+clusterconfig = re.sub('^catalog\.passwd=.*$', '', clusterconfig, count=1, flags=re.MULTILINE | re.IGNORECASE)
+
+catalog_info = {
+    'driver': c_driver,
+    'hostname': c_hostname,
+    'username': c_username,
+    'password': c_password
+}
+
+print(catalog_info)
+print(clusterconfig)
 
 node = {}
 

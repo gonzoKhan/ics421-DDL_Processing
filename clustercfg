@@ -1,1 +1,16 @@
-Hello
+catalog.driver=mysql.connector
+catalog.hostname=127.0.0.1:10000/catalog
+catalog.username=dbuser
+catalog.passwd=mypasswd
+
+numnodes=2
+
+node1.driver=mysql.connector
+node1.hostname=127.0.0.1:10000/test
+node1.username=dbuser
+node1.passwd=jesus
+
+node2.driver=mysql.connector
+node2.hostname=127.0.0.1:10000/test1
+node2.username=dbuser
+node2.passwd=jesus
