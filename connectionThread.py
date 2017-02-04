@@ -17,7 +17,7 @@ class connectionThread (threading.Thread):
             connection = mysql.connector.connect(**self.config)
             cursor = connection.cursor()
             cursor.execute(self.ddl)
-            cursor.clost()
+            cursor.close()
             connection.close()
 
             __updateCatalog()
@@ -50,13 +50,13 @@ class connectionThread (threading.Thread):
             )
             cursor = connection.cursor()
 
-            # Attempt to create table if it doesn't exist.
-            try:
-                cursor.execute(dtables)
-            except:
-                pass
+            # # Attempt to create table if it doesn't exist.
+            # try:
+            #     cursor.execute(dtables)
+            # except:
+            #     pass
 
-            tname = re.search("table (\w+)\(", ddl, flags=re.IGNORECASE).group(1)
+            tname = re.search("table (\w+)\(", ddl, flags=re.IGNORECASE | re.MULTILINE).group(1)
             nodedriver = self.driver
             nodeurl = self.config['host'] + "/" + self.config['database']
             nodeuser = self.config['user']
@@ -64,19 +64,24 @@ class connectionThread (threading.Thread):
             nodeid = self.threadID
             # Query for when a table was created.
             crt_table = (
-                "INSERT INTO DTABLES("
+                "INSERT INTO DTABLES"
                 "(tname, nodedriver, nodeurl, nodeuser, nodepasswd, "
                 "partmtd, nodeid, partcol, partparam1, partparam2) "
                 "VALUES ({0}, {1}, {2}, {3}, {4}, NULL, {5}, NULL, NULL, NULL)"
             )
             # Query for when a table was removed.
-            drop = ""
+            drop_table = "DELETE FROM DTABLES WHERE tname={0}"
 
             # Execute if a table was created
-            cursor.execute(crt.format(tname, nodedriver, nodeurl, nodeuseer, nodepasswd, nodeid))
-            cursor.close()
-            connection.close()
-            
+            if re.search("CREATE TABLE", ddl, flags=re.IGNORECASE | re.MULTILINE):
+                cursor.execute(crt_table.format(tname, nodedriver, nodeurl, nodeuseer, nodepasswd, nodeid))
+            elif re.search("DROP TABLE", ddl, flags=re.IGNORECASE | re.MULTILINE):
+                cursor.execute(drop_table.format(tname))
+
         except mysql.connector.Error as err:
             print(err)
             exit(1)
+        finally:
+            cursor.close()
+            connection.commit()
+            connection.close()
