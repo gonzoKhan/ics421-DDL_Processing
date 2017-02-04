@@ -125,7 +125,7 @@ try:
             'host': nodes[idnum]['hostname'],
             'database': 'node' + str(idnum+1)
         }
-        threads.insert( -1, connectionThread(idnum+1, config, ddl) )
+        threads.insert( -1, connectionThread(idnum+1, config, ddl, nodes[idnum]['driver'], catalog_info) )
 
     # For loop that runs each connectionThread.
     for conn in threads:
