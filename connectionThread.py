@@ -12,20 +12,6 @@ class connectionThread (threading.Thread):
         self.driver = driver
         self.catalog_info = catalog_info
 
-    def run(self):
-        try:
-            connection = mysql.connector.connect(**self.config)
-            cursor = connection.cursor()
-            cursor.execute(self.ddl)
-            cursor.close()
-            connection.close()
-
-            __updateCatalog()
-            print("SUCCESS: THREAD{0} (database={1},hostname={2}): Sucessfully executed DDL".format(self.threadID, self.config['database'], self.config['host']))
-
-        except mysql.connector.Error as err:
-            print("FAILURE: THREAD{0} (database={1},hostname={2}): ".format(self.threadID, self.config['database'], self.config['host']) + err.msg)
-
     def __updateCatalog(self):
         dtables = (
             "CREATE TABLE "
@@ -38,7 +24,7 @@ class connectionThread (threading.Thread):
             "nodeid int, "
             "partcol char(32), "
             "partparam1 char(32), "
-            "partparam2 char(32))"
+            "partparam2 char(32));"
         )
 
         try:
@@ -50,13 +36,13 @@ class connectionThread (threading.Thread):
             )
             cursor = connection.cursor()
 
-            # # Attempt to create table if it doesn't exist.
-            # try:
-            #     cursor.execute(dtables)
-            # except:
-            #     pass
+            # Attempt to create table if it doesn't exist.
+            try:
+                cursor.execute(dtables)
+            except:
+                pass
 
-            tname = re.search("table (\w+)\(", ddl, flags=re.IGNORECASE | re.MULTILINE).group(1)
+            tname = re.search("table (\w+)\(", self.ddl, flags=re.IGNORECASE | re.MULTILINE).group(1)
             nodedriver = self.driver
             nodeurl = self.config['host'] + "/" + self.config['database']
             nodeuser = self.config['user']
@@ -67,21 +53,40 @@ class connectionThread (threading.Thread):
                 "INSERT INTO DTABLES"
                 "(tname, nodedriver, nodeurl, nodeuser, nodepasswd, "
                 "partmtd, nodeid, partcol, partparam1, partparam2) "
-                "VALUES ({0}, {1}, {2}, {3}, {4}, NULL, {5}, NULL, NULL, NULL)"
+                "VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', NULL, '{5}', NULL, NULL, NULL);"
             )
             # Query for when a table was removed.
-            drop_table = "DELETE FROM DTABLES WHERE tname={0}"
+            drop_table = "DELETE FROM DTABLES WHERE tname={0};"
 
             # Execute if a table was created
-            if re.search("CREATE TABLE", ddl, flags=re.IGNORECASE | re.MULTILINE):
-                cursor.execute(crt_table.format(tname, nodedriver, nodeurl, nodeuseer, nodepasswd, nodeid))
-            elif re.search("DROP TABLE", ddl, flags=re.IGNORECASE | re.MULTILINE):
+            if re.search("CREATE TABLE", self.ddl, flags=re.IGNORECASE | re.MULTILINE):
+                cursor.execute(crt_table.format(tname, nodedriver, nodeurl, nodeuser, nodepasswd, nodeid))
+                print("ADDED TABLE: {0}".format(tname))
+            elif re.search("DROP TABLE", self.ddl, flags=re.IGNORECASE | re.MULTILINE):
                 cursor.execute(drop_table.format(tname))
+                print("REMOVED TABLE: {0}".format(tname))
 
         except mysql.connector.Error as err:
             print(err)
             exit(1)
+        except Exception as err:
+            print(str(err))
         finally:
             cursor.close()
             connection.commit()
             connection.close()
+
+
+    def run(self):
+        try:
+            connection = mysql.connector.connect(**self.config)
+            cursor = connection.cursor()
+            cursor.execute(self.ddl)
+            cursor.close()
+            connection.close()
+
+            self.__updateCatalog()
+            print("SUCCESS: THREAD{0} (database={1},hostname={2}): Sucessfully executed DDL".format(self.threadID, self.config['database'], self.config['host']))
+
+        except mysql.connector.Error as err:
+            print("FAILURE: THREAD{0} (database={1},hostname={2}): ".format(self.threadID, self.config['database'], self.config['host']) + err.msg)
