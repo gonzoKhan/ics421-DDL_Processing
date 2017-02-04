@@ -6,7 +6,7 @@ from connectionThread import connectionThread
 # Parses a line seperating it into a 3-tuple
 def parseLine(line):
     try:
-        m = re.match('^(\w+)\.(\w+)=(.*)$', line)
+        m = re.match('^node(\d+)\.(\w+)=(.*)$', line)
         return m.group(1,2,3)
     except AttributeError:
         return None
@@ -74,22 +74,11 @@ for line in c_buffer:
         parsed = parseLine(line)
         if parsed:
             inserted = False
-            (name, key, value) = parsed
-            for x in range(numnodes):
-                # Insert if name of node is found
-                if 'name' in nodes[x] and nodes[x]['name'] == name:
-                    nodes[x][key] = value
-                    inserted = True
-            if not inserted:
-                # Find a nameless node and name it and insert
-                for x in range(numnodes):
-                    if not 'name' in nodes[x]:
-                        nodes[x]['name'] = name
-                        nodes[x][key] = value
-                        inserted = True
-                        break;
-            if not inserted:
-                print("Error: number of nodes given is incorrect.")
+            (num, key, value) = parsed
+            try:
+                nodes[int(num)-1][key] = value
+            except:
+                print("Error: numnodes in config is incorrect.")
 
 
 # for x in range(1,int(nodes)+1):
@@ -128,19 +117,25 @@ print (nodes)
 # For loop that generates a dictionary object containing the parameters
 # for a nodes connection then makes a connectionThread for each node.
 threads = list()
+try:
+    for idnum in range(len(nodes)):
+        config = {
+            'user': nodes[idnum]['username'],
+            'password': nodes[idnum]['passwd'],
+            'host': nodes[idnum]['hostname'],
+            'database': 'node' + str(idnum+1)
+        }
+        threads.insert( -1, connectionThread(idnum+1, config, ddl) )
 
-for idnum in range(len(nodes)):
-    config = {
-        'user': nodes[idnum]['username'],
-        'password': nodes[idnum]['passwd'],
-        'host': nodes[idnum]['hostname'],
-        'database': nodes[idnum]['name']
-    }
-    threads.insert( -1, connectionThread(idnum, config, ddl) )
+    # For loop that runs each connectionThread.
+    for conn in threads:
+        conn.run()
+except KeyError as err:
+    print('INVALID FORMAT IN CLUSTERCONFIG: Expected ' + str(err))
+    print('FAILED TO EXECUTE DDL')
+except:
+    print('UNEXPECTED ERROR')
 
-# For loop that runs each connectionThread.
-for conn in threads:
-    conn.run()
 
 
 # Connects to the mysql database
