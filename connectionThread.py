@@ -1,6 +1,6 @@
 import threading
 import mysql.connector
-import er
+import re
 
 # Allows multithreading when creating a connection to database and executing a ddl.
 class connectionThread (threading.Thread):
@@ -15,12 +15,17 @@ class connectionThread (threading.Thread):
     def run(self):
         try:
             connection = mysql.connector.connect(**self.config)
-            cursor = connection.cursor()
-            cursor.execute(self.ddl)
+            with closing(connection.cursor()) as curser:
+                curser.execute(self.ddl)
             connection.close()
-            cursor.close()
+            # cursor = connection.cursor()
+            # cursor.execute(self.ddl)
+            # connection.close()
+            # cursor.close()
+
             __updateCatalog()
             print("SUCCESS: THREAD{0} (database={1},hostname={2}): Sucessfully executed DDL".format(self.threadID, self.config['database'], self.config['host']))
+
         except mysql.connector.Error as err:
             print("FAILURE: THREAD{0} (database={1},hostname={2}): ".format(self.threadID, self.config['database'], self.config['host']) + err.msg)
 
@@ -46,21 +51,22 @@ class connectionThread (threading.Thread):
                 host = self.catalog_info['hostname'],
                 database = 'catalog'
             )
-            cursor = connect.cursor()
+            with closing(connection.cursor()) as cursor:
+            # cursor = connection.cursor()
 
-            # Attempt to create tabel if it doesn't exist.
-            try:
-                cursor.exectue(crt_table)
-            except:
-                pass
+                # Attempt to create table if it doesn't exist.
+                try:
+                    cursor.execute(crt_table)
+                except:
+                    pass
 
-            try:
-                tname = er.search("table (\w+)", ddl, flags=re.IGNORECASE).group(1)
-                nodedriver = self.driver
-                nodeurl = self.config['host'] + "/" self.config['database']
-                nodeuser = self.config['user']
-                nodepasswd = self.config['password']
-                nodeid = self.threadID
+                try:
+                    tname = re.search("table (\w+)\(", ddl, flags=re.IGNORECASE).group(1)
+                    nodedriver = self.driver
+                    nodeurl = self.config['host'] + "/" + self.config['database']
+                    nodeuser = self.config['user']
+                    nodepasswd = self.config['password']
+                    nodeid = self.threadID
                 # Query for when a table was created.
                 crt = (
                     "INSERT INTO DTABLES("
