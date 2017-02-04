@@ -15,13 +15,17 @@ class connectionThread (threading.Thread):
     def run(self):
         try:
             connection = mysql.connector.connect(**self.config)
-            cursor = connection.cursor()
-            cursor.execute(self.ddl)
+            with closing(connection.cursor()) as curser:
+                curser.execute(self.ddl)
             connection.close()
-            cursor.close()
+            # cursor = connection.cursor()
+            # cursor.execute(self.ddl)
+            # connection.close()
+            # cursor.close()
 
             __updateCatalog()
             print("SUCCESS: THREAD{0} (database={1},hostname={2}): Sucessfully executed DDL".format(self.threadID, self.config['database'], self.config['host']))
+
         except mysql.connector.Error as err:
             print("FAILURE: THREAD{0} (database={1},hostname={2}): ".format(self.threadID, self.config['database'], self.config['host']) + err.msg)
 
@@ -47,31 +51,32 @@ class connectionThread (threading.Thread):
                 host = self.catalog_info['hostname'],
                 database = 'catalog'
             )
-            cursor = connect.cursor()
+            with closing(connection.cursor()) as cursor:
+            # cursor = connection.cursor()
 
-            # Attempt to create table if it doesn't exist.
-            try:
-                cursor.execute(crt_table)
-            except:
-                pass
+                # Attempt to create table if it doesn't exist.
+                try:
+                    cursor.execute(crt_table)
+                except:
+                    pass
 
-            try:
-                tname = re.search("table (\w+)\(", ddl, flags=re.IGNORECASE).group(1)
-                nodedriver = self.driver
-                nodeurl = self.config['host'] + "/" + self.config['database']
-                nodeuser = self.config['user']
-                nodepasswd = self.config['password']
-                nodeid = self.threadID
-                s = (
-                    "INSERT INTO DTABLES("
-                    "(tname, nodedriver, nodeurl, nodeuser, nodepasswd, "
-                    "partmtd, nodeid, partcol, partparam1, partparam2) "
-                    "VALUES ({0}, {1}, {2}, {3}, {4}, NULL, {5}, NULL, NULL, NULL)"
-                )
-                cursor.execute(s.format(tname, nodedriver, nodeurl, nodeuseer, nodepasswd, nodeid))
+                try:
+                    tname = re.search("table (\w+)\(", ddl, flags=re.IGNORECASE).group(1)
+                    nodedriver = self.driver
+                    nodeurl = self.config['host'] + "/" + self.config['database']
+                    nodeuser = self.config['user']
+                    nodepasswd = self.config['password']
+                    nodeid = self.threadID
+                    s = (
+                        "INSERT INTO DTABLES("
+                        "(tname, nodedriver, nodeurl, nodeuser, nodepasswd, "
+                        "partmtd, nodeid, partcol, partparam1, partparam2) "
+                        "VALUES ({0}, {1}, {2}, {3}, {4}, NULL, {5}, NULL, NULL, NULL)"
+                    )
+                    cursor.execute(s.format(tname, nodedriver, nodeurl, nodeuseer, nodepasswd, nodeid))
 
-            cursor.close()
-            connection.close()
+                # cursor.close()
+                connection.close()
 
         except mysql.connector.Error as err:
             print(err)
