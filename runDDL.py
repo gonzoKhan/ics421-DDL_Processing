@@ -1,7 +1,7 @@
 import sys
 import re
-import mysql.connector
 import io
+from connectionThread import connectionThread
 
 # Parses a line seperating it into a 3-tuple
 def parseLine(line):
@@ -89,7 +89,7 @@ for line in c_buffer:
                         break;
             if not inserted:
                 print("Error: number of nodes given is incorrect.")
-                
+
 
 # for x in range(1,int(nodes)+1):
 #     for y in range(0,5):
@@ -126,9 +126,20 @@ print (nodes)
 
 # For loop that generates a dictionary object containing the parameters
 # for a nodes connection then makes a connectionThread for each node.
+threads = list()
 
+for idnum in range(len(nodes)):
+    config = {
+        'user': nodes[idnum]['username'],
+        'password': nodes[idnum]['passwd'],
+        'host': nodes[idnum]['hostname'],
+        'database': nodes[idnum]['name']
+    }
+    threads.insert( -1, connectionThread(idnum, config, ddl) )
 
 # For loop that runs each connectionThread.
+for conn in threads:
+    conn.run()
 
 
 # Connects to the mysql database
