@@ -101,8 +101,6 @@ try:
 except KeyError as err:
     print('INVALID FORMAT IN CLUSTERCONFIG: Expected ' + str(err))
     print('FAILED TO EXECUTE DDL')
-except:
-    print('UNEXPECTED ERROR')
 
 cluster.close()
 ddlfile.close()
