@@ -25,7 +25,8 @@ else:
 
 # Opens the config and ddl files
 cluster = open(clustername,'r')
-ddl = open(ddlname,'r')
+ddlfile = open(ddlname,'r')
+ddl = ddlfile.read()
 
 # Sets Variables from config
 clusterconfig = cluster.read()
@@ -151,4 +152,4 @@ for conn in threads:
 
 #print (cluster.read() + ddl.read())
 cluster.close()
-ddl.close()
+ddlfile.close()
