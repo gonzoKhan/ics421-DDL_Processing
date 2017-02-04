@@ -32,10 +32,11 @@ clusterconfig = cluster.read()
 print(clusterconfig)
 
 # Grab the number of nodes then remove the line.
-nodes = re.search('^numnodes=(\d+)$', clusterconfig, flags=re.MULTILINE | re.IGNORECASE).group(1)
+numnodes = re.search('^numnodes=(\d+)$', clusterconfig, flags=re.MULTILINE | re.IGNORECASE).group(1)
+numnodes = int(numnodes)
 clusterconfig = re.sub('^numnodes=(\d+)$', '', clusterconfig, count=1, flags=re.MULTILINE | re.IGNORECASE)
 
-print("nodes={0}".format(nodes))
+print("nodes={0}".format(numnodes))
 print(clusterconfig)
 
 c_driver = re.search('^catalog\.driver=(.*)$', clusterconfig, flags=re.MULTILINE | re.IGNORECASE).group(1)
@@ -60,17 +61,27 @@ catalog_info = {
 print(catalog_info)
 print(clusterconfig)
 
-node = {}
+c_buffer = io.StringIO(clusterconfig)
 
-for x in range(1,int(nodes)+1):
-    for y in range(0,5):
-        currentline = cluster.readline()
-        temp = parseLine(currentline)
-        if temp != None:
-            (name, att, val) = temp
-            node[x, att] = val
+nodes = [dict() for x in range(numnodes)]
 
-print (node)
+for line in c_buffer:
+    if line:
+        parsed = parseLine(line)
+        if parsed:
+                print(parsed)
+
+
+
+# for x in range(1,int(nodes)+1):
+#     for y in range(0,5):
+#         currentline = cluster.readline()
+#         temp = parseLine(currentline)
+#         if temp != None:
+#             (name, att, val) = temp
+#             node[x, att] = val
+
+print (nodes)
 
 # For loop that parses clusterconfig into an array of dictionary objects
 # containing the keys:
