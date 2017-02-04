@@ -16,5 +16,6 @@ class connectionThread (threading.Thread):
             cursor.execute(self.ddl)
             connection.close()
             cursor.close()
+            print("SUCCESS: THREAD{0} (database={1},hostname={2}): Sucessfully executed DDL".format(self.threadID, self.config['database'], self.config['host']))
         except mysql.connector.Error as err:
-            print(err.msg)
+            print("FAILURE: THREAD{0} (database={1},hostname={2}): ".format(self.threadID, self.config['database'], self.config['host']) + err.msg)
