@@ -65,13 +65,31 @@ c_buffer = io.StringIO(clusterconfig)
 
 nodes = [dict() for x in range(numnodes)]
 
+inserted = False
+
+# Read each line into the dictionary "nodes"
 for line in c_buffer:
     if line:
         parsed = parseLine(line)
         if parsed:
-                print(parsed)
-
-
+            inserted = False
+            (name, key, value) = parsed
+            for x in range(numnodes):
+                # Insert if name of node is found
+                if 'name' in nodes[x] and nodes[x]['name'] == name:
+                    nodes[x][key] = value
+                    inserted = True
+            if not inserted:
+                # Find a nameless node and name it and insert
+                for x in range(numnodes):
+                    if not 'name' in nodes[x]:
+                        nodes[x]['name'] = name
+                        nodes[x][key] = value
+                        inserted = True
+                        break;
+            if not inserted:
+                print("Error: number of nodes given is incorrect.")
+                
 
 # for x in range(1,int(nodes)+1):
 #     for y in range(0,5):
