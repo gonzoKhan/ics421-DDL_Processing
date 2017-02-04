@@ -47,6 +47,7 @@ class connectionThread (threading.Thread):
                 database = 'catalog'
             )
             cursor = connect.cursor()
+
             # Attempt to create tabel if it doesn't exist.
             try:
                 cursor.exectue(crt_table)
@@ -60,13 +61,18 @@ class connectionThread (threading.Thread):
                 nodeuser = self.config['user']
                 nodepasswd = self.config['password']
                 nodeid = self.threadID
-                s = (
+                # Query for when a table was created.
+                crt = (
                     "INSERT INTO DTABLES("
                     "(tname, nodedriver, nodeurl, nodeuser, nodepasswd, "
                     "partmtd, nodeid, partcol, partparam1, partparam2) "
                     "VALUES ({0}, {1}, {2}, {3}, {4}, NULL, {5}, NULL, NULL, NULL)"
                 )
-                cursor.execute(s.format(tname, nodedriver, nodeurl, nodeuseer, nodepasswd, nodeid))
+                # Query for when a table was removed.
+                drop = ""
+
+                # Execute if a table was created
+                cursor.execute(crt.format(tname, nodedriver, nodeurl, nodeuseer, nodepasswd, nodeid))
             except:
                 print("ERROR DURING DTABLES UPDATE")
             cursor.close()
