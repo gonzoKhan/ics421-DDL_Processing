@@ -54,7 +54,7 @@ class connectionThread (threading.Thread):
                 pass
 
             try:
-                tname = er.search("table (\w+)\(", ddl, flags=re.IGNORECASE).group(1)
+                tname = er.search("table (\w+)", ddl, flags=re.IGNORECASE).group(1)
                 nodedriver = self.driver
                 nodeurl = self.config['host'] + "/" self.config['database']
                 nodeuser = self.config['user']
@@ -67,6 +67,8 @@ class connectionThread (threading.Thread):
                     "VALUES ({0}, {1}, {2}, {3}, {4}, NULL, {5}, NULL, NULL, NULL)"
                 )
                 cursor.execute(s.format(tname, nodedriver, nodeurl, nodeuseer, nodepasswd, nodeid))
+            except:
+                print("ERROR DURING DTABLES UPDATE")
             cursor.close()
             connection.close()
         except mysql.connector.Error as err:
