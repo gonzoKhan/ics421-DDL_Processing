@@ -63,11 +63,11 @@ class connectionThread (threading.Thread):
             # Execute if a table was created
             if re.search("CREATE TABLE", self.ddl, flags=re.IGNORECASE | re.MULTILINE):
                 cursor.execute(crt_table.format(tname, nodedriver, nodeurl, nodeuser, nodepasswd, nodeid))
-                print("ADDED TABLE: {0}".format(tname))
+                print("RECORD: ADDED TABLE {0} TO NODE{1}".format(tname, nodeid))
             # Else execute this is table was dropped.
             elif re.search("DROP TABLE", self.ddl, flags=re.IGNORECASE | re.MULTILINE):
                 cursor.execute(drop_table.format(tname))
-                print("REMOVED TABLE: {0}".format(tname))
+                print("RECORD: REMOVED TABLE {0} FROM NODE{1}".format(tname, nodeid))
 
         except mysql.connector.Error as err:
             print(err)

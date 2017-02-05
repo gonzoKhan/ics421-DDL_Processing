@@ -95,3 +95,7 @@ ENV/
 .ropeproject
 
 # End of https://www.gitignore.io/api/python
+
+# ignore test config/ddl files
+*cfg
+ddl*
