@@ -12,6 +12,7 @@ class connectionThread (threading.Thread):
         self.driver = driver
         self.catalog_info = catalog_info
 
+    # Updates dtables in the catalog that keeps track of tables being added or removed.
     def __updateCatalog(self):
         dtables = (
             "CREATE TABLE "
@@ -36,12 +37,13 @@ class connectionThread (threading.Thread):
             )
             cursor = connection.cursor()
 
-            # Attempt to create table if it doesn't exist.
+            # Attempt to create table in case it doesn't exist.
             try:
                 cursor.execute(dtables)
             except:
                 pass
 
+            # Grab the table name from the ddl
             tname = re.search("table (\w+)", self.ddl, flags=re.IGNORECASE | re.MULTILINE).group(1)
             nodedriver = self.driver
             nodeurl = self.config['host'] + "/" + self.config['database']
@@ -62,6 +64,7 @@ class connectionThread (threading.Thread):
             if re.search("CREATE TABLE", self.ddl, flags=re.IGNORECASE | re.MULTILINE):
                 cursor.execute(crt_table.format(tname, nodedriver, nodeurl, nodeuser, nodepasswd, nodeid))
                 print("ADDED TABLE: {0}".format(tname))
+            # Else execute this is table was dropped.
             elif re.search("DROP TABLE", self.ddl, flags=re.IGNORECASE | re.MULTILINE):
                 cursor.execute(drop_table.format(tname))
                 print("REMOVED TABLE: {0}".format(tname))
@@ -69,6 +72,9 @@ class connectionThread (threading.Thread):
         except mysql.connector.Error as err:
             print(err)
             exit(1)
+        except Error as err:
+            print("ERROR UPDATING DTABLES:")
+            print(str(err))
         finally:
             cursor.close()
             connection.commit()

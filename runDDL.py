@@ -13,7 +13,6 @@ def parseLine(line):
 
 # Allows custom config and ddl files to be run as parameters.
 # clusrcfg and ddlfile are the default if no parameters are entered.
-
 if len(sys.argv) > 1:
     clustername = sys.argv[1]
 else:
@@ -26,20 +25,17 @@ else:
 # Opens the config and ddl files
 cluster = open(clustername,'r')
 ddlfile = open(ddlname,'r')
-ddl = ddlfile.read()
 
-# Sets Variables from config
+# Get strings for clusterconfig and ddl
 clusterconfig = cluster.read()
-print(clusterconfig)
+ddl = ddlfile.read()
 
 # Grab the number of nodes then remove the line.
 numnodes = re.search('^numnodes=(\d+)$', clusterconfig, flags=re.MULTILINE | re.IGNORECASE).group(1)
 numnodes = int(numnodes)
 clusterconfig = re.sub('^numnodes=(\d+)$', '', clusterconfig, count=1, flags=re.MULTILINE | re.IGNORECASE)
 
-print("nodes={0}".format(numnodes))
-print(clusterconfig)
-
+# Grab the config for the catalog
 c_driver = re.search('^catalog\.driver=(.*)$', clusterconfig, flags=re.MULTILINE | re.IGNORECASE).group(1)
 clusterconfig = re.sub('^catalog\.driver=.*$', '', clusterconfig, count=1, flags=re.MULTILINE | re.IGNORECASE)
 
@@ -59,28 +55,23 @@ catalog_info = {
     'password': c_password
 }
 
-print(catalog_info)
-print(clusterconfig)
-
+# Use StrinIO to read string line by line.
 c_buffer = io.StringIO(clusterconfig)
 
+# List of dictionary objects that will hold the parsed config data.
 nodes = [dict() for x in range(numnodes)]
-
-inserted = False
 
 # Read each line into the dictionary "nodes"
 for line in c_buffer:
     if line:
         parsed = parseLine(line)
-        if parsed:
-            inserted = False
+        if parsed and len(parsed) == 3:
             (num, key, value) = parsed
             try:
                 nodes[int(num)-1][key] = value
             except:
-                print("Error: numnodes in config is incorrect.")
-
-print (nodes)
+                print("Error: numnodes or node numbers in config are incorrect.")
+                
 
 # For loop that generates a dictionary object containing the parameters
 # for a nodes connection then makes a connectionThread for each node.
