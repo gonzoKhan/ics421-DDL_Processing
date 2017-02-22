@@ -4,12 +4,12 @@ import re
 
 # Allows multithreading when creating a connection to database and executing a ddl.
 class connectionThread (threading.Thread):
-    def __init__(self, threadID, config, ddl, driver, catalog_info):
+    def __init__(self, threadID, config, ddl, nodeinfo, catalog_info):
         threading.Thread.__init__(self)
         self.threadID = threadID
         self.config = config
         self.ddl = ddl
-        self.driver = driver
+        self.nodeinfo = nodeinfo
         self.catalog_info = catalog_info
 
     # Updates dtables in the catalog that keeps track of tables being added or removed.
@@ -33,7 +33,8 @@ class connectionThread (threading.Thread):
                 user = self.catalog_info['username'],
                 password = self.catalog_info['password'],
                 host = self.catalog_info['hostname'],
-                database = 'catalog'
+                database = self.catalog_info['database'],
+                port = self.catalog_info['port']
             )
             cursor = connection.cursor()
 
@@ -45,8 +46,8 @@ class connectionThread (threading.Thread):
 
             # Grab the table name from the ddl
             tname = re.search("table (\w+)", self.ddl, flags=re.IGNORECASE | re.MULTILINE).group(1)
-            nodedriver = self.driver
-            nodeurl = self.config['host'] + "/" + self.config['database']
+            nodedriver = self.nodeinfo['driver']
+            nodeurl = self.nodeinfo['hostname']
             nodeuser = self.config['user']
             nodepasswd = self.config['password']
             nodeid = self.threadID

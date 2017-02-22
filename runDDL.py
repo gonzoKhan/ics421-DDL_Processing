@@ -6,7 +6,7 @@ from connectionThread import connectionThread
 # Parses a line seperating it into a 3-tuple
 def parseLine(line):
     try:
-        m = re.match('^node(\d+)\.(\w+)=(.*)$', line)
+        m = re.match('^\w+(\d+)\.(\w+)=(.*)$', line)
         return m.group(1,2,3)
     except AttributeError:
         return None
@@ -48,11 +48,20 @@ clusterconfig = re.sub('^catalog\.username=.*$', '', clusterconfig, count=1, fla
 c_password = re.search('^catalog\.passwd=(.*)$', clusterconfig, flags=re.MULTILINE | re.IGNORECASE).group(1)
 clusterconfig = re.sub('^catalog\.passwd=.*$', '', clusterconfig, count=1, flags=re.MULTILINE | re.IGNORECASE)
 
+# Parse hostname into address and database
+hostmatch = re.search('^.*//([\.\d]+):(\d+)/(.*)$', c_hostname, flags=re.IGNORECASE)
+c_address = hostmatch.group(1)
+c_port = hostmatch.group(2)
+c_database = hostmatch.group(3)
+
 catalog_info = {
     'driver': c_driver,
-    'hostname': c_hostname,
+    'full_hostname': c_hostname,
+    'hostname': c_address,
     'username': c_username,
-    'password': c_password
+    'password': c_password,
+    'port': c_port,
+    'database': c_database
 }
 
 # Use StrinIO to read string line by line.
@@ -71,7 +80,16 @@ for line in c_buffer:
                 nodes[int(num)-1][key] = value
             except:
                 print("Error: numnodes or node numbers in config are incorrect.")
-                
+
+
+for idnum in range(len(nodes)):
+    if 'hostname' in nodes[idnum]:
+        hostmatch = re.search('^.*//([\.\d]+):(\d+)/(.*)$', nodes[idnum]['hostname'], flags=re.IGNORECASE)
+        nodes[idnum]['address'] = hostmatch.group(1)
+        nodes[idnum]['port'] = hostmatch.group(2)
+        nodes[idnum]['database'] = hostmatch.group(3)
+
+print(nodes)
 
 # For loop that generates a dictionary object containing the parameters
 # for a nodes connection then makes a connectionThread for each node.
@@ -81,10 +99,11 @@ try:
         config = {
             'user': nodes[idnum]['username'],
             'password': nodes[idnum]['passwd'],
-            'host': nodes[idnum]['hostname'],
-            'database': 'node' + str(idnum+1)
+            'host': nodes[idnum]['address'],
+            'port': nodes[idnum]['port'],
+            'database': nodes[idnum]['database']
         }
-        threads.insert( -1, connectionThread(idnum+1, config, ddl, nodes[idnum]['driver'], catalog_info) )
+        threads.insert( -1, connectionThread(idnum+1, config, ddl, nodes[idnum], catalog_info) )
 
     # For loop that runs each connectionThread.
     for conn in threads:
