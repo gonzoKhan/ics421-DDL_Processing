@@ -89,8 +89,6 @@ for idnum in range(len(nodes)):
         nodes[idnum]['port'] = hostmatch.group(2)
         nodes[idnum]['database'] = hostmatch.group(3)
 
-print(nodes)
-
 # For loop that generates a dictionary object containing the parameters
 # for a nodes connection then makes a connectionThread for each node.
 threads = list()
