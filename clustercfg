@@ -7,11 +7,11 @@ catalog.passwd=mypasswd
 numnodes=2
 
 node1.driver=com.ibm.db2.jcc.DB2Driver
-node1.hostname=jdbc:db2://127.0.0.1:3306/node1
+node1.hostname=jdbc:db2://127.0.0.1:3306/jesusrory1
 node1.username=dbuser
 node1.passwd=mypasswd
 
 node2.driver=com.ibm.db2.jcc.DB2Driver
-node2.hostname=jdbc:db2://127.0.0.1:3306/node2
+node2.hostname=jdbc:db2://127.0.0.1:3306/jesusrory2
 node2.username=dbuser
 node2.passwd=mypasswd
